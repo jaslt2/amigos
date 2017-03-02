@@ -4,12 +4,12 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from rest_framework import serializers, viewsets, routers
 from .models import Task, Proposal
-from .serializers import UserSerializer, TaskSerializer, ProposalSerializer
+from .serializers import *
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()

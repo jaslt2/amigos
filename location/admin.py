@@ -5,4 +5,4 @@ from .models import *
 admin.site.register(Task);
 admin.site.register(Location);
 admin.site.register(Proposal);
-admin.site.register(UserMode);
+admin.site.register(Profile);
