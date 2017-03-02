@@ -27,13 +27,13 @@ class Location(models.Model):
 
 class UserMode(models.Model):
 	user = models.OneToOneField(User, related_name='mode')
-	mode = models.CharField(choices=[(choice.value, choice.name.replace("_", " ")) for choice in Mode], max_length=50, default=Mode.PRIVATE)
+	mode = models.CharField(choices=[(choice.value, choice.name.replace("_", " ")) for choice in Mode], max_length=1, default=Mode.PRIVATE)
 
 class Task(models.Model):
     user = models.ForeignKey('auth.User')
     title = models.CharField(max_length=200)
     description = models.TextField()
-    status = models.CharField(choices=[(choice.value, choice.name.replace("_", " ")) for choice in TaskStatus], max_length=50, default=TaskStatus.OPEN)
+    status = models.CharField(choices=[(choice.value, choice.name.replace("_", " ")) for choice in TaskStatus], max_length=1, default=TaskStatus.OPEN)
     created_date = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(default=timezone.now)
 
