@@ -2,13 +2,13 @@ from django.conf.urls import url, include
 from rest_framework_swagger.views import get_swagger_view
 from rest_framework import routers
 
-from .views import UserViewSet,TaskViewSet, ProposalViewSet
+from .views import *
 
 swagger_view = get_swagger_view(title='Amigos API')
 
 # Routers provide a way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+router.register(r'users', UserProfileViewSet)
 router.register(r'tasks', TaskViewSet)
 router.register(r'proposals', ProposalViewSet)
 

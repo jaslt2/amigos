@@ -22,40 +22,43 @@ class Mode(ChoiceEnum):
 	PRIVATE = 1
 	HELP_NEEDED = 2
 
+class BaseModel(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
 class Location(models.Model):
 	longitude = models.DecimalField(max_digits=8, decimal_places=3)
 	latitude = models.DecimalField(max_digits=8, decimal_places=3)
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     location = models.OneToOneField(Location, blank=True, null=True)
     mode = models.IntegerField(choices=Mode.choices(), default=1, blank=True)
 
-    # @receiver(post_save, sender=User)
-    # def save_user_profile(sender, instance, **kwargs):
-    # 	instance.profile.save()
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+    	instance.user_profile.save()
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
 	    if created:
 	        Profile.objects.create(user=instance)
 
-class Task(models.Model):
-    user = models.ForeignKey(Profile)
+class Task(BaseModel):
+    userProfile = models.ForeignKey(Profile)
     title = models.CharField(max_length=200)
     description = models.TextField()
     status = models.IntegerField(choices=TaskStatus.choices(), default=1, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
-    last_modified = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.title
 
-class Proposal(models.Model):
+class Proposal(BaseModel):
 	task = models.ForeignKey(Task, related_name='proposals', default=None)
-	user = models.ForeignKey(Profile)
-	created_date = models.DateTimeField(default=timezone.now)
-	last_modified = models.DateTimeField(default=timezone.now)
+	userProfile = models.ForeignKey(Profile)
 	status = models.IntegerField(choices=ProposalStatus.choices(), default=1, blank=True)
 
 

@@ -18,8 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('url', 'username')
-        
+        fields = ('id','url', 'username')
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     location = LocationSerializer()
@@ -34,23 +34,64 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('location', 'mode', 'user')
+        fields = ('id','location', 'mode', 'user')
+
+class TaskIdField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.id
+
+    def to_internal_value(self, data):
+        return Task.objects.filter(id=data)
+
+class UpdateProposalSerializer(serializers.ModelSerializer):
+    status = serializers.IntegerField()
+
+    class Meta:
+        model = Proposal
+        fields = ('status',)
+
+class NewProposalSerializer(serializers.ModelSerializer):
+    task = TaskIdField(queryset=Task.objects.all())
+
+    def create(self, validated_data):
+        taskId = validated_data['task']
+        validated_data['task'] = Task.objects.filter(id=taskId)[0]
+        currentUser = self.context['request'].user
+        profile = Profile.objects.filter(user=currentUser).get()  
+        validated_data['userProfile'] = profile
+        return Proposal.objects.create(**validated_data)
+
+    class Meta:
+        model = Proposal
+        fields = ('task',)
 
 class ProposalSerializer(serializers.ModelSerializer):
-    user = ProfileSerializer()
+    userProfile = ProfileSerializer()
     created_date = serializers.ReadOnlyField()
     last_modified = serializers.ReadOnlyField()
 
     class Meta:
         model = Proposal
-        fields = ('task', 'user', 'created_date', 'last_modified', 'status', 'url')
+        fields = ('id','task', 'userProfile', 'created_date', 'last_modified', 'status', 'url')
+
+class NewTaskSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        currentUser = self.context['request'].user
+        profile = Profile.objects.filter(user=currentUser).get()  
+        validated_data['userProfile'] = profile
+        return Task.objects.create(**validated_data)
+
+    class Meta:
+        model = Task
+        fields = ('title', 'description',)
 
 class TaskSerializer(serializers.ModelSerializer):
-    user = ProfileSerializer()
+    userProfile = ProfileSerializer()
     created_date = serializers.ReadOnlyField()
     last_modified = serializers.ReadOnlyField()
     proposals = ProposalSerializer(many=True)
 
     class Meta:
         model = Task
-        fields = ('user', 'title', 'description', 'created_date', 'last_modified', 'proposals', 'status', 'url')
+        fields = ('id','userProfile', 'title', 'description', 'created_date', 'last_modified', 'proposals', 'status', 'url')
