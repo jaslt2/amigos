@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from .models import *
 
-class LocationSerializer(serializers.ModelSerializer):
+class NewLocationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Location(**validated_data)
@@ -11,6 +11,17 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('longitude', 'latitude')
+
+class LocationSerializer(serializers.ModelSerializer):
+    created_date = serializers.ReadOnlyField()
+    last_modified = serializers.ReadOnlyField()
+
+    def create(self, validated_data):
+        return Location(**validated_data)
+
+    class Meta:
+        model = Location
+        fields = ('created_date','last_modified','longitude', 'latitude')
 
 class UserSerializer(serializers.ModelSerializer):
     url = serializers.ReadOnlyField()
@@ -34,7 +45,24 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id','location', 'mode', 'user')
+        fields = ('created_date','last_modified','id','location', 'mode', 'user')
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    location = NewLocationSerializer(required=False)
+    mode = serializers.IntegerField(required=False)
+
+    def update(self, instance, validated_data):
+        location_data = validated_data.pop('location', None)
+        if location_data:
+            location = Location.objects.get_or_create(**location_data)[0]
+            instance.location = location
+        instance.mode = validated_data.get('mode', instance.mode)
+        instance.save()
+        return instance
+
+    class Meta:
+        model = Profile
+        fields = ('location', 'mode')
 
 class TaskIdField(serializers.RelatedField):
     def to_representation(self, value):

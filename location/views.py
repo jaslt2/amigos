@@ -9,7 +9,10 @@ from .serializers import *
 # ViewSets define the view behavior.
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return UpdateProfileSerializer
+        return ProfileSerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()

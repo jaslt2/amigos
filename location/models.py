@@ -29,11 +29,11 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-class Location(models.Model):
+class Location(BaseModel):
 	longitude = models.DecimalField(max_digits=8, decimal_places=3)
 	latitude = models.DecimalField(max_digits=8, decimal_places=3)
 
-class Profile(models.Model):
+class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     location = models.OneToOneField(Location, blank=True, null=True)
     mode = models.IntegerField(choices=Mode.choices(), default=1, blank=True)
