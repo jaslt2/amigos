@@ -38,9 +38,9 @@ class Profile(BaseModel):
     location = models.OneToOneField(Location, blank=True, null=True)
     mode = models.IntegerField(choices=Mode.choices(), default=1, blank=True)
 
-    @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, **kwargs):
-    	instance.user_profile.save()
+    # @receiver(post_save, sender=User)
+    # def save_user_profile(sender, instance, **kwargs):
+    # 	instance.user_profile.save()
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
