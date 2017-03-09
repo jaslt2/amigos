@@ -5,8 +5,8 @@ class AuthenticationTestCase(APITestCase):
 
 	def test_auth(self):
 		self.register_user()
-		self.login_user()
-		self.password_change()
+		key = self.login_user()
+		self.password_change(key)
 		self.logout_user()
 
 	def register_user(self):
@@ -31,12 +31,14 @@ class AuthenticationTestCase(APITestCase):
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		return response.data['key']
 
-	def password_change(self):
+	def password_change(self, key):
 		url = '/rest-auth/password/change/'
 		data = {
 		    "new_password1": "testPassw0rd1",
 		    "new_password2": "testPassw0rd1"
 		}
+		# put the token in the Authorization header
+		self.client.credentials(HTTP_AUTHORIZATION='Token ' + key)
 		response = self.client.post(url, data, format='json')
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 

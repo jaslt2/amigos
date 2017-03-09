@@ -80,6 +80,7 @@ class UpdateProposalSerializer(serializers.ModelSerializer):
 
 class NewProposalSerializer(serializers.ModelSerializer):
     task = TaskIdField(queryset=Task.objects.all())
+    id = serializers.ReadOnlyField()
 
     def create(self, validated_data):
         taskId = validated_data['task']
@@ -91,7 +92,7 @@ class NewProposalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Proposal
-        fields = ('task',)
+        fields = ('task', 'id')
 
 class ProposalSerializer(serializers.ModelSerializer):
     userProfile = ProfileSerializer()
@@ -103,6 +104,7 @@ class ProposalSerializer(serializers.ModelSerializer):
         fields = ('id','task', 'userProfile', 'created_date', 'last_modified', 'status', 'url')
 
 class NewTaskSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
 
     def create(self, validated_data):
         currentUser = self.context['request'].user
@@ -112,7 +114,7 @@ class NewTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('title', 'description',)
+        fields = ('title', 'description','id')
 
 class TaskSerializer(serializers.ModelSerializer):
     userProfile = ProfileSerializer()
